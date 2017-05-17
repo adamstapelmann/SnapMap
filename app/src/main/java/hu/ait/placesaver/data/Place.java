@@ -22,6 +22,7 @@ public class Place extends RealmObject {
     private double lat, lng;
     private Date pickUpDate;
     private boolean uploadedPicure=false;
+    private String pictureURL;
 
     public Place() {
 
@@ -102,8 +103,14 @@ public class Place extends RealmObject {
     }
 
 
-    public void uploadedPicture(){
+    public void setPlacePictureURL(String url){
+        pictureURL=url;
+    }
+    public String getPlacePictureURL(){
+        return pictureURL;
+    }
 
+    public void uploadedPicture(){
         uploadedPicure=true;
     }
     public boolean hasPlacePicture(){

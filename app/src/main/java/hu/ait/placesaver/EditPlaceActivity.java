@@ -50,6 +50,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     private ImageView openCameraIv;
     private ImageView viewPicture;
     private Place placeToEdit = null;
+    private Bitmap pictureTakenBitmap=null;
 
     private PlacesLocationManager placesLocationManager = new PlacesLocationManager(this);
     private double lat, lng;
@@ -104,6 +105,10 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     private void setUpViewPictureImageViewBtn(){
         viewPicture = (ImageView) findViewById(R.id.viewPic);
 
+
+        if (placeToEdit!=null && placeToEdit.hasPlacePicture()) {
+
+
             viewPicture.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -111,7 +116,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
                 }
             });
 
-
+        }
 
     }
 
@@ -127,6 +132,8 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         placeToEdit = getRealm().where(Place.class)
                 .equalTo("placeID", placeID)
                 .findFirst();
+
+        Log.v("PLACE_ID",placeID);
 
         etLocTitle.setText(placeToEdit.getLocTitle());
         etLocDate.setText(placeToEdit.getLocDate());
@@ -148,10 +155,12 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
             @Override
             public void onClick(View view) {
                 savePlace();
-                try {
-//                    uploadImage();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if (pictureTakenBitmap!=null) {
+                    try {
+                        uploadImage();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
 
             }
@@ -180,10 +189,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
 
     }
 
-    private void uploadPicture(){
 
-
-    }
 
     public Realm getRealm() {
         return ((MainApplication)getApplication()).getRealmPlaces();
@@ -241,15 +247,11 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
                 && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED)) {
             placesLocationManager.startLocationMonitoring(this);
-            Log.v("MONITORING BEGINS","true");
-            Log.v("CAMERA GRANTER", Integer.toString(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)));
 
-            Log.v("PERM GRANTED CODE",Integer.toString(PackageManager.PERMISSION_GRANTED));
         }else{
 
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},
                     101);
-            Log.v("REQYEST PERMISI","request permission");
         }
 
     }
@@ -265,17 +267,6 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         lng = location.getLongitude();
     }
 
-    private void saveClick(){
-//        if (imgAttach.getVisibility() == View.GONE) {
-//            uploadPost();
-//        } else {
-//            try {
-//                uploadPostWithImage();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-    }
 
 
     @Override
@@ -283,14 +274,15 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             Bitmap img = (Bitmap) data.getExtras().get("data");
             viewPicture.setImageBitmap(img);
-
+            pictureTakenBitmap=img;
         }
     }
     public void uploadImage() throws Exception {
-
-        viewPicture.setDrawingCacheEnabled(true);
-        viewPicture.buildDrawingCache();
-        Bitmap bitmap = viewPicture.getDrawingCache();
+//
+//        viewPicture.setDrawingCacheEnabled(true);
+//        viewPicture.buildDrawingCache();
+//        Bitmap bitmap = viewPicture.getDrawingCache();
+        Bitmap bitmap = pictureTakenBitmap;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] imageInBytes = baos.toByteArray();
@@ -315,6 +307,10 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
 //                uploadPost(taskSnapshot.getDownloadUrl().toString());
+                getRealm().beginTransaction();
+                placeToEdit.uploadedPicture();
+                placeToEdit.setPlacePictureURL(taskSnapshot.getDownloadUrl().toString());
+                getRealm().commitTransaction();
             }
         });
 
