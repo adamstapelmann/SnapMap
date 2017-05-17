@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -41,6 +42,8 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     public static final String KEY_PLACE = "KEY_PLACE";
     public static final int RESULT_CODE_DELETE = 1002;
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int ZOOM_LEVEL= 10;
+    public static final String PICTURE_URL = "PICTURE_URL";
 
     private EditText etLocTitle;
     private EditText etLocDate;
@@ -68,8 +71,6 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         setupUI();
 
 
-        setUpCameraImageViewBtn();
-        setUpViewPictureImageViewBtn();
 
 
         if (getIntent().getSerializableExtra(MainActivity.KEY_EDIT) != null) {
@@ -77,6 +78,10 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         } else {
             canCreate = true;
         }
+
+
+        setUpCameraImageViewBtn();
+        setUpViewPictureImageViewBtn();
 
         latlongIv = (ImageView) findViewById(R.id.lat_long_iv);
         latlongIv.setOnClickListener(new View.OnClickListener() {
@@ -86,6 +91,8 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
                 Toast.makeText(EditPlaceActivity.this, "Lat" + lat + "\n" + "lng: " + lng, Toast.LENGTH_SHORT).show();
             }
         });
+
+
 
 
     }
@@ -106,12 +113,18 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         viewPicture = (ImageView) findViewById(R.id.viewPic);
 
 
+
         if (placeToEdit!=null && placeToEdit.hasPlacePicture()) {
 
+
+            Glide.with(this).load(placeToEdit.getPlacePictureURL()).into(viewPicture);
 
             viewPicture.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
+
+                    openViewPictureActivity(placeToEdit.getPlacePictureURL());
 
                 }
             });
@@ -120,6 +133,13 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
 
     }
 
+
+    private void openViewPictureActivity(String imageURL){
+        Intent i = new Intent(this, ViewPlacePictureActivity.class);
+        i.putExtra(PICTURE_URL,imageURL);
+        startActivity(i);
+
+    }
     private void initCreate() {
         getRealm().beginTransaction();
         placeToEdit = getRealm().createObject(Place.class, UUID.randomUUID().toString());
@@ -250,7 +270,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
 
         }else{
 
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_FINE_LOCATION},
                     101);
         }
 
@@ -263,11 +283,11 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     }
     @Override
     public void onNewLocation(Location location) {
+        Log.v("NEW LCN CALLED","calling on new locn");
         lat = location.getLatitude();
         lng = location.getLongitude();
+
     }
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -314,7 +334,6 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
             }
         });
 
-
     }
 
 
@@ -350,9 +369,23 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-        LatLng sydney = new LatLng(lat, lng);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Your current location"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+        LatLng placeCoords;
+
+        Log.v("ABOUT TO SET MARKER","checking if place already exists");
+        if (placeToEdit!=null){
+
+            placeCoords= new LatLng(placeToEdit.getLat(), placeToEdit.getLng());
+        }else{
+
+            placeCoords= new LatLng(lat, lng);
+        }
+
+        Log.v("PLACING MARKER","placingmarker");
+        mMap.addMarker(new MarkerOptions().position(placeCoords).title("Your current location"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(placeCoords));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
+
     }
 
 

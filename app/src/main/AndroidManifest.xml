@@ -9,7 +9,8 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
@@ -28,9 +29,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".EditPlaceActivity" >
-
-
+        <activity android:name=".EditPlaceActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -55,6 +54,7 @@
         <activity
             android:name=".MapsActivityAllPoints"
             android:label="@string/title_activity_maps_all_points" />
+        <activity android:name=".ViewPlacePictureActivity"></activity>
     </application>
 
 </manifest>
