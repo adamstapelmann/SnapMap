@@ -175,13 +175,6 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
             @Override
             public void onClick(View view) {
                 savePlace();
-                if (pictureTakenBitmap!=null) {
-                    try {
-                        uploadImage();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
 
             }
         });
@@ -221,6 +214,14 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         }
 
         getRealm().beginTransaction();
+
+        if (pictureTakenBitmap!=null) {
+            try {
+                uploadImage();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         placeToEdit.setLocTitle(etLocTitle.getText().toString());
         placeToEdit.setLocDate(etLocDate.getText().toString());
