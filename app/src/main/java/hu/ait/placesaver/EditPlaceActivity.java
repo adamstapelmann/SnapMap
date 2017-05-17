@@ -292,16 +292,15 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
-            Bitmap img = (Bitmap) data.getExtras().get("data");
-            viewPicture.setImageBitmap(img);
-            pictureTakenBitmap=img;
+            if (data.getExtras()!=null){
+                pictureTakenBitmap = (Bitmap) data.getExtras().get("data");
+                viewPicture.setImageBitmap(pictureTakenBitmap);
+            }
+
         }
     }
     public void uploadImage() throws Exception {
-//
-//        viewPicture.setDrawingCacheEnabled(true);
-//        viewPicture.buildDrawingCache();
-//        Bitmap bitmap = viewPicture.getDrawingCache();
+
         Bitmap bitmap = pictureTakenBitmap;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
@@ -326,7 +325,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-//                uploadPost(taskSnapshot.getDownloadUrl().toString());
+                
                 getRealm().beginTransaction();
                 placeToEdit.uploadedPicture();
                 placeToEdit.setPlacePictureURL(taskSnapshot.getDownloadUrl().toString());
