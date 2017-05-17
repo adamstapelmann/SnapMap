@@ -24,7 +24,7 @@
 
 
         <ImageView
-            android:id="@+id/ivLocImg"
+            android:id="@+id/lat_long_iv"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:src="@mipmap/ic_launcher"

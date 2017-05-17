@@ -38,7 +38,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     private EditText etLocDate;
     private EditText etLocTime;
     private EditText etLocDescription;
-    private ImageView ivLocImg;
+    private ImageView latlongIv;
     private ImageView openCameraIv;
     private ImageView viewPicture;
     private Place placeToEdit = null;
@@ -58,25 +58,25 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
 
         setupUI();
 
+
+        setUpCameraImageViewBtn();
+        setUpViewPictureImageViewBtn();
+
+
         if (getIntent().getSerializableExtra(MainActivity.KEY_EDIT) != null) {
             initEdit();
         } else {
             canCreate = true;
         }
 
-        ivLocImg = (ImageView) findViewById(R.id.ivLocImg);
-        ivLocImg.setOnClickListener(new View.OnClickListener() {
+        latlongIv = (ImageView) findViewById(R.id.lat_long_iv);
+        latlongIv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.v("IMAGE VIEW TOAST","Toast should pop up");
                 Toast.makeText(EditPlaceActivity.this, "Lat" + lat + "\n" + "lng: " + lng, Toast.LENGTH_SHORT).show();
             }
         });
-
-        setUpCameraImageViewBtn();
-        setUpViewPictureImageViewBtn();
-
-
 
 
     }
@@ -94,7 +94,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     }
 
     private void setUpViewPictureImageViewBtn(){
-        viewPicture = (ImageView) findViewById(R.id.ivLocImg);
+        viewPicture = (ImageView) findViewById(R.id.viewPic);
         viewPicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
