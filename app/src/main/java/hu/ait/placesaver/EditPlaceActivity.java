@@ -144,6 +144,8 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         getRealm().beginTransaction();
         placeToEdit = getRealm().createObject(Place.class, UUID.randomUUID().toString());
         placeToEdit.setPickUpDate(new Date(System.currentTimeMillis()));
+
+
         getRealm().commitTransaction();
     }
 
@@ -152,8 +154,6 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         placeToEdit = getRealm().where(Place.class)
                 .equalTo("placeID", placeID)
                 .findFirst();
-
-        Log.v("PLACE_ID",placeID);
 
         etLocTitle.setText(placeToEdit.getLocTitle());
         etLocDate.setText(placeToEdit.getLocDate());
@@ -325,7 +325,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                
+
                 getRealm().beginTransaction();
                 placeToEdit.uploadedPicture();
                 placeToEdit.setPlacePictureURL(taskSnapshot.getDownloadUrl().toString());
@@ -351,7 +351,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
                     grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1]==PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Permissions granted", Toast.LENGTH_SHORT).show();
                 placesLocationManager.startLocationMonitoring(this);
-                Log.v("PERMISSIONS GRANTER", "granted");
+                Log.v("PERMISSIONS GRANTED", "granted");
 
             } else {
                 Toast.makeText(this, "Permissions not granted", Toast.LENGTH_SHORT).show();
@@ -381,7 +381,9 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         }
 
         Log.v("PLACING MARKER","placingmarker");
-        mMap.addMarker(new MarkerOptions().position(placeCoords).title("Your current location"));
+
+        MarkerOptions marker = new MarkerOptions().position(placeCoords).title("Your current location");
+        mMap.addMarker(marker);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(placeCoords));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
 

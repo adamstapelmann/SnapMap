@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -58,7 +60,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         viewHolder.tvLocTitle.setText(placesList.get(position).getLocTitle());
         viewHolder.tvLocDate.setText(placesList.get(position).getLocDate());
 
-        //viewHolder.ivLocImg.setImageResource(R.drawable.something..);
+        Glide.with((MainActivity)context).load(placesList.get(position).getPlacePictureURL()).into(viewHolder.ivLocImg);
 
         viewHolder.btnDetails.setOnClickListener(new View.OnClickListener() {
             @Override
