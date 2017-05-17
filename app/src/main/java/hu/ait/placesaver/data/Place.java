@@ -1,5 +1,6 @@
 package hu.ait.placesaver.data;
 
+import android.graphics.Bitmap;
 import android.location.Location;
 
 import java.util.Comparator;
@@ -20,6 +21,7 @@ public class Place extends RealmObject {
     private String locDescription;
     private double lat, lng;
     private Date pickUpDate;
+    private boolean uploadedPicure=false;
 
     public Place() {
 
@@ -97,6 +99,15 @@ public class Place extends RealmObject {
 
     public String getPlaceID() {
         return placeID;
+    }
+
+
+    public void uploadedPicture(){
+
+        uploadedPicure=true;
+    }
+    public boolean hasPlacePicture(){
+        return uploadedPicure;
     }
 
     private int getLocYear() {

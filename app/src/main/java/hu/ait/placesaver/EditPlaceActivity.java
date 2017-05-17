@@ -3,6 +3,7 @@ package hu.ait.placesaver;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -22,7 +23,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.UUID;
 
@@ -95,12 +103,16 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
 
     private void setUpViewPictureImageViewBtn(){
         viewPicture = (ImageView) findViewById(R.id.viewPic);
-        viewPicture.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-            }
-        });
+            viewPicture.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
+
+
+
     }
 
     private void initCreate() {
@@ -120,6 +132,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         etLocDate.setText(placeToEdit.getLocDate());
         etLocTime.setText(placeToEdit.getLocTime());
         etLocDescription.setText(placeToEdit.getLocDescription());
+
     }
 
     private void setupUI() {
@@ -130,13 +143,17 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         etLocDescription = (EditText) findViewById(R.id.etLocDescription);
 
 
-
-
         Button btnSave = (Button) findViewById(R.id.btnSave);
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 savePlace();
+                try {
+//                    uploadImage();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         });
 
@@ -160,6 +177,11 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+    }
+
+    private void uploadPicture(){
+
 
     }
 
@@ -243,6 +265,63 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         lng = location.getLongitude();
     }
 
+    private void saveClick(){
+//        if (imgAttach.getVisibility() == View.GONE) {
+//            uploadPost();
+//        } else {
+//            try {
+//                uploadPostWithImage();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            Bitmap img = (Bitmap) data.getExtras().get("data");
+            viewPicture.setImageBitmap(img);
+
+        }
+    }
+    public void uploadImage() throws Exception {
+
+        viewPicture.setDrawingCacheEnabled(true);
+        viewPicture.buildDrawingCache();
+        Bitmap bitmap = viewPicture.getDrawingCache();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageInBytes = baos.toByteArray();
+
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        String newImage = placeToEdit.getPlaceID() +".jpg";
+        StorageReference newImageRef = storageRef.child(newImage);
+        StorageReference newImageImagesRef = storageRef.child("images/"+newImage);
+        newImageRef.getName().equals(newImageImagesRef.getName());    // true
+        newImageRef.getPath().equals(newImageImagesRef.getPath());    // false
+
+
+        UploadTask uploadTask = newImageImagesRef.putBytes(imageInBytes);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle unsuccessful uploads
+                Toast.makeText(EditPlaceActivity.this, exception.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+//                uploadPost(taskSnapshot.getDownloadUrl().toString());
+            }
+        });
+
+
+    }
+
+
     @Override
     protected void onDestroy() {
         if (placesLocationManager != null) {
@@ -279,4 +358,8 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         mMap.addMarker(new MarkerOptions().position(sydney).title("Your current location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
+
+
 }
+
+
