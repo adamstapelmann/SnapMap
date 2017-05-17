@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,12 +32,15 @@ import io.realm.Realm;
 public class EditPlaceActivity extends AppCompatActivity implements PlacesLocationManager.OnNewLocationAvailable, OnMapReadyCallback {
     public static final String KEY_PLACE = "KEY_PLACE";
     public static final int RESULT_CODE_DELETE = 1002;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private EditText etLocTitle;
     private EditText etLocDate;
     private EditText etLocTime;
     private EditText etLocDescription;
     private ImageView ivLocImg;
+    private ImageView openCameraIv;
+    private ImageView viewPicture;
     private Place placeToEdit = null;
 
     private PlacesLocationManager placesLocationManager = new PlacesLocationManager(this);
@@ -64,7 +68,37 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         ivLocImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.v("IMAGE VIEW TOAST","Toast should pop up");
                 Toast.makeText(EditPlaceActivity.this, "Lat" + lat + "\n" + "lng: " + lng, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        setUpCameraImageViewBtn();
+        setUpViewPictureImageViewBtn();
+
+
+
+
+    }
+
+    private void setUpCameraImageViewBtn(){
+
+        openCameraIv = (ImageView) findViewById(R.id.cameraIcon);
+        openCameraIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openCamera();
+
+            }
+        });
+    }
+
+    private void setUpViewPictureImageViewBtn(){
+        viewPicture = (ImageView) findViewById(R.id.ivLocImg);
+        viewPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
     }
@@ -89,10 +123,14 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     }
 
     private void setupUI() {
+
         etLocTitle = (EditText) findViewById(R.id.etLocTitle);
         etLocDate = (EditText) findViewById(R.id.etLocDate);
         etLocTime = (EditText) findViewById(R.id.etLocTime);
         etLocDescription = (EditText) findViewById(R.id.etLocDescription);
+
+
+
 
         Button btnSave = (Button) findViewById(R.id.btnSave);
         btnSave.setOnClickListener(new View.OnClickListener() {
@@ -174,15 +212,31 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     }
 
     private void requestNeededPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                    101);
-        } else {
+
+        if ( (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED)
+
+                && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED)) {
             placesLocationManager.startLocationMonitoring(this);
+            Log.v("MONITORING BEGINS","true");
+            Log.v("CAMERA GRANTER", Integer.toString(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)));
+
+            Log.v("PERM GRANTED CODE",Integer.toString(PackageManager.PERMISSION_GRANTED));
+        }else{
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_COARSE_LOCATION},
+                    101);
+            Log.v("REQYEST PERMISI","request permission");
         }
+
     }
 
+    private void openCamera(){
+        Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+
+        startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
+    }
     @Override
     public void onNewLocation(Location location) {
         lat = location.getLatitude();
@@ -200,8 +254,14 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == 101) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1]==PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permissions granted", Toast.LENGTH_SHORT).show();
                 placesLocationManager.startLocationMonitoring(this);
+                Log.v("PERMISSIONS GRANTER", "granted");
+
+            } else {
+                Toast.makeText(this, "Permissions not granted", Toast.LENGTH_SHORT).show();
             }
         }
     }
