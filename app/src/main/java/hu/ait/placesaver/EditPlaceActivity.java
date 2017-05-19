@@ -82,6 +82,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
             initEdit();
         } else {
             canCreate = true;
+            canGetCurrentLoc = true;
         }
 
 

@@ -54,7 +54,7 @@ public class MapsActivityAllPoints extends FragmentActivity implements OnMapRead
             LatLng marker = new LatLng(allPlaces.get(0).getLat(), allPlaces.get(0).getLng());
 
             for (Place place : allPlaces) {
-                marker = new LatLng(place.getLat(), place.getLat());
+                marker = new LatLng(place.getLat(), place.getLng());
                 mMap.addMarker(new MarkerOptions().position(marker).title(place.getLocTitle()));
             }
 
