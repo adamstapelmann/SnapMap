@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.Collections;
 import java.util.List;
@@ -63,7 +62,6 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         viewHolder.tvLocTitle.setText(placesList.get(position).getLocTitle());
         viewHolder.tvLocDate.setText(placesList.get(position).getLocDate());
 
-        Glide.with((MainActivity)context).load(placesList.get(position).getPlacePictureURL()).into(viewHolder.ivLocImg);
 
         viewHolder.btnDetails.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,6 +73,8 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         });
 
         setAnimation(viewHolder.itemView, position);
+        Glide.with((MainActivity)context).load(placesList.get(position).getPlacePictureURL()).into(viewHolder.ivLocImg);
+
     }
 
     @Override

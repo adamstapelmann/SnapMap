@@ -23,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -58,10 +59,13 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
 
     private PlacesLocationManager placesLocationManager = new PlacesLocationManager(this);
     private double lat, lng;
+    private double currentLat, currentLng;
 
     private GoogleMap mMap;
+    private Marker mkr;
 
     private boolean canCreate = false;
+    private boolean canGetCurrentLoc = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,18 +87,6 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
 
         setUpCameraImageViewBtn();
         setUpViewPictureImageViewBtn();
-
-        latlongIv = (ImageView) findViewById(R.id.lat_long_iv);
-        latlongIv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.v("IMAGE VIEW TOAST","Toast should pop up");
-                Toast.makeText(EditPlaceActivity.this, "Lat" + lat + "\n" + "lng: " + lng, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-
 
     }
 
@@ -161,6 +153,9 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         etLocTime.setText(placeToEdit.getLocTime());
         etLocDescription.setText(placeToEdit.getLocDescription());
 
+        lat = placeToEdit.getLat();
+        lng = placeToEdit.getLng();
+
     }
 
     private void setupUI() {
@@ -194,6 +189,16 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
             }
         });
 
+
+        latlongIv = (ImageView) findViewById(R.id.lat_long_iv);
+        latlongIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                canGetCurrentLoc = true;
+                Toast.makeText(EditPlaceActivity.this, "Lat" + lat + "\n" + "lng: " + lng, Toast.LENGTH_SHORT).show();
+            }
+        });
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -211,8 +216,6 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
             initCreate();
         }
 
-        getRealm().beginTransaction();
-
         if (pictureTakenBitmap!=null) {
             try {
                 uploadImage();
@@ -220,6 +223,8 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
                 e.printStackTrace();
             }
         }
+
+        getRealm().beginTransaction();
 
         placeToEdit.setLocTitle(etLocTitle.getText().toString());
         placeToEdit.setLocDate(etLocDate.getText().toString());
@@ -236,8 +241,13 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
             Intent intentResult = new Intent();
             intentResult.putExtra(KEY_PLACE, placeToEdit.getPlaceID());
             setResult(RESULT_OK, intentResult);
-            finish();
+            Log.v("ADDED ITEM","Adedd");
+
+//            finish();
         }
+
+
+
     }
 
     private boolean canSave() {
@@ -289,10 +299,17 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     }
     @Override
     public void onNewLocation(Location location) {
-        Log.v("NEW LCN CALLED","calling on new locn");
-        lat = location.getLatitude();
-        lng = location.getLongitude();
+        currentLat = location.getLatitude();
+        currentLng = location.getLongitude();
 
+        if (canGetCurrentLoc) {
+            LatLng placeCoords = new LatLng(currentLat, currentLng);
+            mkr.setPosition(placeCoords);
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(placeCoords));
+
+            lat = currentLat;
+            lng = currentLng;
+        }
 
     }
 
@@ -334,9 +351,12 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
 
                 getRealm().beginTransaction();
+                Log.v("SET DOWNLAOD URL","url");
                 placeToEdit.uploadedPicture();
                 placeToEdit.setPlacePictureURL(taskSnapshot.getDownloadUrl().toString());
                 getRealm().commitTransaction();
+                finish();
+
             }
         });
 
@@ -377,26 +397,45 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-        LatLng placeCoords;
-        Log.v("ABOUT TO SET MARKER","checking if place already exists");
-        if (placeToEdit!=null){
+        final LatLng placeCoords;
 
-            Log.v("HAD LAT LONG",""+ placeToEdit.getLat() + placeToEdit.getLng());
+        if (placeToEdit!=null){
 
             placeCoords= new LatLng(placeToEdit.getLat(), placeToEdit.getLng());
         }else{
-
-            Log.v("DIDNT HAVE LAT LONG","didnt");
-
-            placeCoords= new LatLng(lat, lng);
+            placeCoords= new LatLng(currentLat, currentLng);
         }
 
-        Log.v("PLACING MARKER","placingmarker");
+        MarkerOptions options = new MarkerOptions()
+                .position(placeCoords)
+                .title("Current location")
+                .draggable(true);
 
-        MarkerOptions marker = new MarkerOptions().position(placeCoords).title("Your current location");
-        mMap.addMarker(marker);
+        mkr = mMap.addMarker(options);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(placeCoords));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
+
+        mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+                canGetCurrentLoc = false;
+            }
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+                mkr.setPosition(marker.getPosition());
+                //mMap.moveCamera(CameraUpdateFactory.newLatLng(placeCoords));
+            }
+
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                mkr.setPosition(marker.getPosition());
+                //mMap.moveCamera(CameraUpdateFactory.newLatLng(placeCoords));
+                lat = marker.getPosition().latitude;
+                lng = marker.getPosition().longitude;
+            }
+        });
 
 
 
