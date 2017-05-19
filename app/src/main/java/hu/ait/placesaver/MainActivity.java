@@ -213,8 +213,13 @@ public class MainActivity extends AppCompatActivity {
             case EditPlaceActivity.RESULT_CODE_DELETE:
                 String delPlaceId  = data.getStringExtra(
                         EditPlaceActivity.KEY_PLACE);
+
+                if (placesAdapter.getPlaceByKey(delPlaceId).hasPlacePicture()){
+
+                    removePlacePictureFromFirebase(delPlaceId);
+                }
+
                 placesAdapter.removePlaceByKey(delPlaceId);
-                removePlacePictureFromFirebase(delPlaceId);
 
                 break;
         }
@@ -243,11 +248,15 @@ public class MainActivity extends AppCompatActivity {
     }
     public void deletePlace(Place place) {
 
-        removePlacePictureFromFirebase(place.getPlaceID());
+        if (place.hasPlacePicture()){
+
+            removePlacePictureFromFirebase(place.getPlaceID());
+
+        }
+        
         getRealm().beginTransaction();
         place.deleteFromRealm();
         getRealm().commitTransaction();
-
 
 
     }

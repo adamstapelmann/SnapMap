@@ -110,6 +110,7 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         }
     }
 
+
     public void swapPlaces(int oldPosition, int newPosition) {
         if (oldPosition < newPosition) {
             for (int i = oldPosition; i < newPosition; i++) {
@@ -127,6 +128,18 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         return placesList.get(i);
     }
 
+
+    public Place getPlaceByKey(String key) {
+
+        Place returnPlace = null;
+        for (int i = 0; i < placesList.size(); i++) {
+            if (placesList.get(i).getPlaceID().equals(key)) {
+                    returnPlace= placesList.get(i);
+            }
+        }
+        return returnPlace;
+
+    }
     public void sortByName(){
         Collections.sort(placesList, new Place.NameCompare());
         notifyDataSetChanged();
