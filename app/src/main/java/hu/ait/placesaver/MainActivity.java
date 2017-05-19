@@ -2,6 +2,7 @@ package hu.ait.placesaver;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -13,12 +14,18 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,10 +47,15 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private int placeToEditPosition = -1;
 
+    StorageReference storageRef ;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        storageRef = FirebaseStorage.getInstance().getReference();
 
         setUpRecyclerAdapter();
 
@@ -202,14 +214,42 @@ public class MainActivity extends AppCompatActivity {
                 String delPlaceId  = data.getStringExtra(
                         EditPlaceActivity.KEY_PLACE);
                 placesAdapter.removePlaceByKey(delPlaceId);
+                removePlacePictureFromFirebase(delPlaceId);
+
                 break;
         }
     }
 
+
+    private void removePlacePictureFromFirebase(String id){
+
+        StorageReference pictureReference = storageRef.child("images/"+id+".jpg");
+        pictureReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+
+                Log.v("ITEM DELETED","deleted");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+
+                Log.v("ITEM DELETED","not deleted");
+
+            }
+        });
+
+
+    }
     public void deletePlace(Place place) {
+
+        removePlacePictureFromFirebase(place.getPlaceID());
         getRealm().beginTransaction();
         place.deleteFromRealm();
         getRealm().commitTransaction();
+
+
+
     }
 
 

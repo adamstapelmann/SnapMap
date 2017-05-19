@@ -55,6 +55,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     private Place placeToEdit = null;
     private Bitmap pictureTakenBitmap=null;
 
+
     private PlacesLocationManager placesLocationManager = new PlacesLocationManager(this);
     private double lat, lng;
 
@@ -185,13 +186,10 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
             public void onClick(View v) {
                 String placeId = placeToEdit.getPlaceID();
 
-//                Intent intentResult = new Intent();
-//                intentResult.putExtra(KEY_PLACE, placeId);
-//                setResult(RESULT_CODE_DELETE, intentResult);
+                Intent intentResult = new Intent();
+                intentResult.putExtra(KEY_PLACE, placeId);
+                setResult(RESULT_CODE_DELETE, intentResult);
 
-                getRealm().beginTransaction();
-                placeToEdit.deleteFromRealm();
-                getRealm().commitTransaction();
                 finish();
             }
         });

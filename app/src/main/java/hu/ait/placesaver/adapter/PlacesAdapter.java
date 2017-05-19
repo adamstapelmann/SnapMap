@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +42,8 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
     private List<Place> placesList;
     private Context context;
     private int lastPosition = -1;
+
+
 
     public PlacesAdapter(List<Place> placesList, Context context) {
         this.placesList = placesList;
@@ -96,11 +99,13 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         notifyItemRemoved(index);
     }
 
+
+
     public void removePlaceByKey(String key) {
-        for (Place p : placesList) {
-            if (p.getPlaceID().equals(key)){
-                placesList.remove(p);
-                notifyDataSetChanged();
+        for (int i = 0; i < placesList.size(); i++) {
+            if (placesList.get(i).getPlaceID().equals(key)) {
+                placesList.remove(i);
+                notifyItemRemoved(i);
             }
         }
     }
