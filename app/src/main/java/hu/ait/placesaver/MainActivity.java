@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
             removePlacePictureFromFirebase(place.getPlaceID());
 
         }
-        
+
         getRealm().beginTransaction();
         place.deleteFromRealm();
         getRealm().commitTransaction();

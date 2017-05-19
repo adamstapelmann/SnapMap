@@ -48,14 +48,18 @@ public class MapsActivityAllPoints extends FragmentActivity implements OnMapRead
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
         RealmResults<Place> allPlaces = getRealm().where(Place.class).findAll();
-        LatLng marker = new LatLng(allPlaces.get(0).getLat(), allPlaces.get(0).getLng());
 
-        for (Place place : allPlaces) {
-            marker = new LatLng(place.getLat(), place.getLat());
-            mMap.addMarker(new MarkerOptions().position(marker).title(place.getLocTitle()));
+        if (allPlaces.size()>0) {
+
+            LatLng marker = new LatLng(allPlaces.get(0).getLat(), allPlaces.get(0).getLng());
+
+            for (Place place : allPlaces) {
+                marker = new LatLng(place.getLat(), place.getLat());
+                mMap.addMarker(new MarkerOptions().position(marker).title(place.getLocTitle()));
+            }
+
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(marker));
+
         }
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(marker));
-
     }
 }
