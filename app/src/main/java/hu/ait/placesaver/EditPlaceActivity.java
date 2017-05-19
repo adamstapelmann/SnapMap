@@ -66,11 +66,11 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_place);
+
+
         requestNeededPermission();
 
         setupUI();
-
-
 
 
         if (getIntent().getSerializableExtra(MainActivity.KEY_EDIT) != null) {
@@ -228,6 +228,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         placeToEdit.setLocTime(etLocTime.getText().toString());
         placeToEdit.setLocDescription(etLocDescription.getText().toString());
 
+
         placeToEdit.setLat(lat);
         placeToEdit.setLng(lng);
 
@@ -262,14 +263,20 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
 
     private void requestNeededPermission() {
 
+        Log.v("permissionmethod","method");
+
         if ( (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
                 PackageManager.PERMISSION_GRANTED)
 
                 && (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED)) {
+
+            Log.v("START MONITORING","monitoring");
             placesLocationManager.startLocationMonitoring(this);
 
         }else{
+            Log.v("REQUEST PERM","requesting");
+
 
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,Manifest.permission.ACCESS_FINE_LOCATION},
                     101);
@@ -287,6 +294,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         Log.v("NEW LCN CALLED","calling on new locn");
         lat = location.getLatitude();
         lng = location.getLongitude();
+
 
     }
 
@@ -352,6 +360,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
                     grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1]==PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Permissions granted", Toast.LENGTH_SHORT).show();
                 placesLocationManager.startLocationMonitoring(this);
+
                 Log.v("PERMISSIONS GRANTED", "granted");
 
             } else {
@@ -359,6 +368,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
             }
         }
     }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -369,14 +379,16 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-
         LatLng placeCoords;
-
         Log.v("ABOUT TO SET MARKER","checking if place already exists");
         if (placeToEdit!=null){
 
+            Log.v("HAD LAT LONG",""+ placeToEdit.getLat() + placeToEdit.getLng());
+
             placeCoords= new LatLng(placeToEdit.getLat(), placeToEdit.getLng());
         }else{
+
+            Log.v("DIDNT HAVE LAT LONG","didnt");
 
             placeCoords= new LatLng(lat, lng);
         }
@@ -388,7 +400,11 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         mMap.moveCamera(CameraUpdateFactory.newLatLng(placeCoords));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
 
+
+
+
     }
+
 
 
 }
