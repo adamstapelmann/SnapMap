@@ -37,6 +37,8 @@ import hu.ait.placesaver.touch.PlacesTouchHelperAdapter;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
+import static hu.ait.placesaver.ViewPlacePictureActivity.PICTURE_URL;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final int REQUEST_NEW_PLACE = 101;
@@ -262,6 +264,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void openViewPlacePictureActivity(String url){
+
+        Intent i = new Intent(this, ViewPlacePictureActivity.class);
+
+        i.putExtra(PICTURE_URL,url);
+        startActivity(i);
+    }
     private void showSnackBarMessage(String message) {
         Snackbar.make(layoutContent,
                 message,

@@ -1,6 +1,7 @@
 package hu.ait.placesaver.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import hu.ait.placesaver.MainActivity;
 import hu.ait.placesaver.R;
+import hu.ait.placesaver.ViewPlacePictureActivity;
 import hu.ait.placesaver.data.Place;
 
 public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder> {
@@ -75,7 +77,17 @@ public class PlacesAdapter extends RecyclerView.Adapter<PlacesAdapter.ViewHolder
         setAnimation(viewHolder.itemView, position);
         Glide.with((MainActivity)context).load(placesList.get(position).getPlacePictureURL()).into(viewHolder.ivLocImg);
 
+        viewHolder.ivLocImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                ((MainActivity)context).openViewPlacePictureActivity(placesList.get(viewHolder.getAdapterPosition()).getPlacePictureURL());
+
+            }
+        });
+
     }
+
 
     @Override
     public int getItemCount() {
