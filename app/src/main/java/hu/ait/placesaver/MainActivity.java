@@ -235,13 +235,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(Void aVoid) {
 
-                Log.v("ITEM DELETED","deleted");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
 
-                Log.v("ITEM DELETED","not deleted");
 
             }
         });

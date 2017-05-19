@@ -45,6 +45,9 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int ZOOM_LEVEL= 10;
     public static final String PICTURE_URL = "PICTURE_URL";
+    public static final String PICTURE_BITMAP = "PICTURE_BITMAP";
+
+
 
     private EditText etLocTitle;
     private EditText etLocDate;
@@ -55,6 +58,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     private ImageView viewPicture;
     private Place placeToEdit = null;
     private Bitmap pictureTakenBitmap=null;
+    private boolean isUploadingPicture=false;
 
 
     private PlacesLocationManager placesLocationManager = new PlacesLocationManager(this);
@@ -106,31 +110,42 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     private void setUpViewPictureImageViewBtn(){
         viewPicture = (ImageView) findViewById(R.id.viewPic);
 
-
-
-        if (placeToEdit!=null && placeToEdit.hasPlacePicture()) {
-
-
+        if (placeToEdit!=null && placeToEdit.hasPlacePicture()){
             Glide.with(this).load(placeToEdit.getPlacePictureURL()).into(viewPicture);
 
-            viewPicture.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-
-
-                    openViewPictureActivity(placeToEdit.getPlacePictureURL());
-
-                }
-            });
-
+        }else if (pictureTakenBitmap!=null){
+            viewPicture.setImageBitmap(pictureTakenBitmap);
         }
+
+
+        viewPicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (placeToEdit !=null && placeToEdit.hasPlacePicture()){
+                    openViewPictureActivityGlide(placeToEdit.getPlacePictureURL());
+                }else if (pictureTakenBitmap!=null){
+
+                    openViewPictureActivityBitmap(pictureTakenBitmap);
+                }
+            }
+        });
+
+
+
 
     }
 
 
-    private void openViewPictureActivity(String imageURL){
+    private void openViewPictureActivityGlide(String imageURL){
         Intent i = new Intent(this, ViewPlacePictureActivity.class);
         i.putExtra(PICTURE_URL,imageURL);
+        startActivity(i);
+
+    }
+    private void openViewPictureActivityBitmap(Bitmap bitmap){
+        Intent i = new Intent(this, ViewPlacePictureActivity.class);
+        i.putExtra(PICTURE_BITMAP,bitmap);
         startActivity(i);
 
     }
@@ -220,6 +235,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         if (pictureTakenBitmap!=null) {
             try {
                 uploadImage();
+                isUploadingPicture=true;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -244,7 +260,9 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
             setResult(RESULT_OK, intentResult);
             Log.v("ADDED ITEM","Adedd");
 
-//            finish();
+            if (!isUploadingPicture) {
+                finish();
+            }
         }
 
 
@@ -265,6 +283,10 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         if (etLocTime.getText().toString().equals("")) {
             canSave = false;
             etLocTime.setError("Please input a valid date");
+        }
+        if (pictureTakenBitmap==null && (placeToEdit!=null && !placeToEdit.hasPlacePicture())){
+            canSave = false;
+            Toast.makeText(this, "Select camera button to take picture", Toast.LENGTH_SHORT).show();
         }
 
         return canSave;
