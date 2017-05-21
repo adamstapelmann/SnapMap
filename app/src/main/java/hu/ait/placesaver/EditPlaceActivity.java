@@ -90,6 +90,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         }
 
 
+
         setUpCameraImageViewBtn();
         setUpViewPictureImageViewBtn();
 
@@ -325,7 +326,7 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
         currentLat = location.getLatitude();
         currentLng = location.getLongitude();
 
-        if (canGetCurrentLoc) {
+        if (canGetCurrentLoc && mkr!=null) {
             LatLng placeCoords = new LatLng(currentLat, currentLng);
             mkr.setPosition(placeCoords);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(placeCoords));
@@ -414,12 +415,6 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.getUiSettings().setZoomGesturesEnabled(true);
-        mMap.getUiSettings().setCompassEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
-
         final LatLng placeCoords;
 
         if (placeToEdit!=null){
@@ -435,6 +430,13 @@ public class EditPlaceActivity extends AppCompatActivity implements PlacesLocati
                 .draggable(true);
 
         mkr = mMap.addMarker(options);
+
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(placeCoords));
         mMap.animateCamera(CameraUpdateFactory.zoomTo(ZOOM_LEVEL));
 
