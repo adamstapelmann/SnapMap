@@ -11,4 +11,15 @@
     <string name="action_hide">Hide</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_activity_maps_all_points">MapAllPoints</string>
+    <string name="details">Details</string>
+    <string name="date_of_event">Date of event</string>
+    <string name="location_title">Location title</string>
+    <string name="welcome_to_the_placesaver_app">Welcome to the PlaceSaver App!</string>
+    <string name="splash_button">Splash Button</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="add_place_description">Add place description</string>
+    <string name="date_mm_dd_yyyy">Date: mm/dd/yyyy</string>
+    <string name="date_hh_mm">Date: hh:mm</string>
+    <string name="add_place_title">Add place title</string>
 </resources>

@@ -34,13 +34,13 @@
                     android:id="@+id/tvLocTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Location title"/>
+                    android:text="@string/location_title"/>
 
                 <TextView
                     android:id="@+id/tvLocDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Date of event"/>
+                    android:text="@string/date_of_event"/>
             </LinearLayout>
 
             <Button
@@ -48,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
-                android:text="Details"/>
+                android:text="@string/details"/>
 
 
         </LinearLayout>

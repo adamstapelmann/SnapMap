@@ -16,7 +16,7 @@
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar"
             android:layout_width="match_parent"
-            android:layout_height="80dp"
+            android:layout_height="@dimen/app_bar_layout_height"
             android:fitsSystemWindows="true"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
@@ -27,9 +27,9 @@
                 android:fitsSystemWindows="true"
                 app:contentScrim="?attr/colorPrimary"
                 android:background="@color/colorPrimary"
-                app:expandedTitleMarginBottom="32dp"
-                app:expandedTitleMarginEnd="64dp"
-                app:expandedTitleMarginStart="48dp"
+                app:expandedTitleMarginBottom="@dimen/fab_expanded_title_margin_bottom"
+                app:expandedTitleMarginEnd="@dimen/fab_expanded_title_margin_end"
+                app:expandedTitleMarginStart="@dimen/fab_expanded_title_margin_start"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <android.support.v7.widget.Toolbar
@@ -54,9 +54,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:src="@android:drawable/ic_menu_add"
-            app:borderWidth="0dp"
-            app:elevation="6dp"
-            android:layout_margin="10dp"
+            app:borderWidth="@dimen/fab_border_width"
+            app:elevation="@dimen/fab_elevation"
+            android:layout_margin="@dimen/fab_layout_margin"
             app:pressedTranslationZ="12dp" />
 
     </android.support.design.widget.CoordinatorLayout>

@@ -13,7 +13,7 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:src="@drawable/splash_activity_icon"
-        android:text="Splash Button"/>
+        android:text="@string/splash_button"/>
 
 
 </RelativeLayout>
